@@ -60,5 +60,7 @@ int main (int argc, char *argv[])
                 free (key);
         }
 
+        hash_map_dump (map);
+
         return 0;
 }

@@ -5,7 +5,7 @@
 
 #include "hash-map.h"
 
-int simple_hash_function (char *str)
+static int simple_hash_function (char *str)
 {
         int len = 0;
         int idx = 0;
@@ -36,6 +36,21 @@ hash_map_t *hash_map_init (void)
         return head;
 }
 
+static hash_node_t *__hash_map_get (hash_map_t *map,
+                                    char *key)
+{
+        hash_node_t *node = NULL, *tmp = NULL;
+        int hash = 0;
+
+        hash = simple_hash_function (key);
+
+        list_for_each_entry (node, &map->hashes[hash], hash) {
+                if (0 == strcmp (key, node->key))
+                        tmp = node;
+        }
+
+        return tmp;
+}
 
 hash_map_t *hash_map_set (hash_map_t *map,
                           char *key,
@@ -45,10 +60,12 @@ hash_map_t *hash_map_set (hash_map_t *map,
         char *old_value = NULL;
         int hash = 0;
 
-        old_value = hash_map_get (map, key);
-        if (old_value) {
-                hash_map_unset (map, key);
-                free (old_value);
+        node = __hash_map_get (map, key);
+        if (node) {
+                free (node->key);
+                free (node->value);
+
+                goto just_set;
         }
 
         node = calloc (1, sizeof (hash_node_t));
@@ -56,13 +73,14 @@ hash_map_t *hash_map_set (hash_map_t *map,
         INIT_LIST_HEAD (&node->nodes);
         INIT_LIST_HEAD (&node->hash);
 
-        node->key = strdup (key);
-        node->value = strdup (value);
-
         list_add (&node->nodes, &map->nodes);
 
         hash = simple_hash_function (key);
         list_add (&node->hash, &map->hashes[hash]);
+
+just_set:
+        node->key = strdup (key);
+        node->value = strdup (value);
 
         return map;
 }
@@ -71,42 +89,31 @@ char *hash_map_get (hash_map_t *map,
                     char *key)
 {
         hash_node_t *node = NULL;
-        int hash = 0;
+        char *value = NULL;
 
-        hash = simple_hash_function (key);
+        node = __hash_map_get (map, key);
 
-        list_for_each_entry (node, &map->hashes[hash], hash) {
-                if (0 == strcmp (key, node->key))
-                        return strdup (node->value);
-        }
+        if (node)
+                value = strdup (node->value);
 
-        return NULL;
+        return value;
 }
 
 hash_map_t *hash_map_unset (hash_map_t *map,
                             char *key)
 {
-        hash_node_t *node = NULL, *tmp = NULL;
-        int hash = 0;
+        hash_node_t *node = NULL;
 
-        hash = simple_hash_function (key);
+        node = __hash_map_get (map, key);
 
+        if (node) {
+                list_del_init (&node->nodes);
+                list_del_init (&node->hash);
 
-        list_for_each_entry (node, &map->hashes[hash], hash) {
-                if (0 == strcmp (key, node->key)) {
-                        tmp = node;
-                        break;
-                }
-        }
+                free (node->key);
+                free (node->value);
 
-        if (tmp) {
-                list_del_init (&tmp->nodes);
-                list_del_init (&tmp->hash);
-
-                free (tmp->key);
-                free (tmp->value);
-
-                free (tmp);
+                free (node);
         }
 
         return map;
@@ -114,11 +121,26 @@ hash_map_t *hash_map_unset (hash_map_t *map,
 
 int hash_map_dump (hash_map_t *map)
 {
+        int idx = 0;
+        int count = 0;
         hash_node_t *node = NULL;
 
-        list_for_each_entry (node, &map->nodes, nodes) {
-                printf ("key: %s\t value: %s\n", node->key, node->value);
+        for (idx = 0; idx < HASHMAX; idx++) {
+                if (!list_empty (&map->hashes[idx])) {
+                        list_for_each_entry (node, &map->hashes[idx], hash) {
+                                count++;
+                        }
+                        printf ("hash value - %d ==> %d entries\n",
+                                idx, count);
+                        count = 0;
+                }
         }
+
+        count = 0;
+        list_for_each_entry (node, &map->nodes, nodes) {
+                count++;
+        }
+        printf ("total entries - %d\n", count);
 
         return 0;
 }
