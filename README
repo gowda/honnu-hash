@@ -1,0 +1,7 @@
+hash_map_init - initialize the hash-map
+
+hash_map_set - set a 'value' to a 'key'
+
+hash_map_get - get the 'value' for a 'key'
+
+hash_map_dump - dump the complete hash-map
