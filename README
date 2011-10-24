@@ -2,21 +2,24 @@ hash_map_t *hash_map_init ()
 
 - initialize a hash map
 
-hash_map_t *hash_map_set (hash_map_t *map,
-                          char *key,
-                          char *value)
+void *hash_map_set (hash_map_t *map,
+                    char *key,
+                    void *value)
 
-- insert a new entry into the hash-map @map with key as @key and value @value
+- insert a new entry into the hash-map @map with key as @key and value @value.
+  returns a pointer to existing @value for the @key, otherwise NULL. caller
+  _should_ handle the return value.
 
-char *hash_map_get (hash_map_t *map,
+void *hash_map_get (hash_map_t *map,
                     char *key)
 
 - retrieve from @map the value corresponding to @key
 
-hash_map_t *hash_map_unset (hash_map_t *map,
-                            char *key)
+void *hash_map_unset (hash_map_t *map,
+                      char *key)
 
-- delete the entry with @key from @map
+- delete the entry with @key from @map. returns @value which _should_ be
+  handled by the caller.
 
 int hash_map_dump (hash_map_t *map)
 

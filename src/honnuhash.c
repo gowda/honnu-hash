@@ -8,7 +8,7 @@
 int main (int argc, char *argv[])
 {
         hash_map_t *map = NULL;
-        char *key = NULL, *value = NULL;
+        char *key = NULL, *value = NULL, *old_value = NULL;
         int idx = 0, r = 0;
 
         map = hash_map_init ();
@@ -26,18 +26,25 @@ int main (int argc, char *argv[])
                 asprintf (&key, "%d", r);
                 asprintf (&value, "%04d", (1000000 % r));
 
-                hash_map_set (map, key, value);
+                old_value = hash_map_set (map, key, value);
+
+                if (old_value) {
+                        free (old_value);
+                        old_value = NULL;
+                }
 
                 free (key);
-                free (value);
         }
 
         /* delete twenty (20) entries from the hash-map randomly */
+        value = NULL;
         for (idx = 0; idx < 10; idx++) {
                 r = (random ()) % 10;
                 asprintf (&key, "%d", r);
 
-                hash_map_unset (map, key);
+                value = hash_map_unset (map, key);
+
+                free (value);
 
                 free (key);
         }
@@ -51,8 +58,6 @@ int main (int argc, char *argv[])
                 value = hash_map_get (map, key);
                 if (value) {
                         printf ("(key, value) ==> (%s, %s)\n", key, value);
-
-                        free (value);
 
                         ++idx;
                 }

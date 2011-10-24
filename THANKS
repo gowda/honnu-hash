@@ -1,1 +1,3 @@
-list.h - linked list implementation borrowed from glusterfs project.
+* glusterfs
+  - list.h - linked list implementation borrowed from glusterfs project with
+    copyright header unchanged.

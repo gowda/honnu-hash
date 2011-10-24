@@ -52,18 +52,20 @@ static hash_node_t *__hash_map_get (hash_map_t *map,
         return tmp;
 }
 
-hash_map_t *hash_map_set (hash_map_t *map,
-                          char *key,
-                          char *value)
+void *hash_map_set (hash_map_t *map,
+                    char *key,
+                    void *value)
 {
         hash_node_t *node = NULL;
-        char *old_value = NULL;
+        void *old_value = NULL;
         int hash = 0;
 
         node = __hash_map_get (map, key);
         if (node) {
                 free (node->key);
-                free (node->value);
+                old_value = node->value;
+
+                node->value = NULL;
 
                 goto just_set;
         }
@@ -80,29 +82,30 @@ hash_map_t *hash_map_set (hash_map_t *map,
 
 just_set:
         node->key = strdup (key);
-        node->value = strdup (value);
+        node->value = value;
 
-        return map;
+        return old_value;
 }
 
-char *hash_map_get (hash_map_t *map,
+void *hash_map_get (hash_map_t *map,
                     char *key)
 {
         hash_node_t *node = NULL;
-        char *value = NULL;
+        void *value = NULL;
 
         node = __hash_map_get (map, key);
 
         if (node)
-                value = strdup (node->value);
+                value = node->value;
 
         return value;
 }
 
-hash_map_t *hash_map_unset (hash_map_t *map,
+void *hash_map_unset (hash_map_t *map,
                             char *key)
 {
         hash_node_t *node = NULL;
+        void *value = NULL;
 
         node = __hash_map_get (map, key);
 
@@ -111,12 +114,14 @@ hash_map_t *hash_map_unset (hash_map_t *map,
                 list_del_init (&node->hash);
 
                 free (node->key);
-                free (node->value);
+
+                value = node->value;
+                node->value = NULL;
 
                 free (node);
         }
 
-        return map;
+        return value;
 }
 
 int hash_map_dump (hash_map_t *map)
