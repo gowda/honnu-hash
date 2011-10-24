@@ -1,7 +1,19 @@
-hash_map_init - initialize the hash-map
+hash_map_t *hash_map_init (int limit)
 
-hash_map_set - set a 'value' to a 'key'
+- initialize a hash map with @limit as the limiting size of entries
 
-hash_map_get - get the 'value' for a 'key'
+hash_map_t *hash_map_set (hash_map_t *map,
+                          char *key,
+                          char *value)
 
-hash_map_dump - dump the complete hash-map
+- insert a new entry into the hash-map @map with key as @key and value @value
+
+char *hash_map_get (hash_map_t *map,
+                    char *key)
+
+- retrieve from @map the value corresponding to @key
+
+int hash_map_dump (hash_map_t *map)
+
+- dump the contents of the hash-map @map as key, value pair
+
