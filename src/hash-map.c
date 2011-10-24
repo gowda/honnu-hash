@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -20,6 +22,13 @@ hash_map_t *hash_map_set (hash_map_t *map,
                           char *value)
 {
         hash_map_t *node = NULL;
+        char *old_value = NULL;
+
+        old_value = hash_map_get (map, key);
+        if (old_value) {
+                hash_map_unset (map, key);
+                free (old_value);
+        }
 
         node = calloc (1, sizeof (hash_map_t));
 

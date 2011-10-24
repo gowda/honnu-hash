@@ -16,9 +16,15 @@ int main (int argc, char *argv[])
                 printf ("failed to initialize hash map\n");
         }
 
+        /* insert 100 random entries
+         * key - random number in the range 0 - 100
+         * value - 1000000 % key
+         */
         for (idx = 0; idx < 100; idx++) {
-                asprintf (&key, "%d", idx);
-                asprintf (&value, "%04d", (1000 - idx));
+                r = random() % 100;
+
+                asprintf (&key, "%d", r);
+                asprintf (&value, "%04d", (1000000 % r));
 
                 hash_map_set (map, key, value);
 
