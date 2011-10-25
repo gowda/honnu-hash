@@ -11,4 +11,7 @@ AC_PROG_CC
 
 AC_CHECK_TOOL([LD],[ld])
 
+AC_CHECK_LIB([pthread], [pthread_mutex_init], , AC_MSG_ERROR([Posix threads \
+                        library is required]))
+
 AC_OUTPUT

@@ -3,11 +3,15 @@
 
 #include "list.h"
 
+#include <pthread.h>
+
 #define HASHMAX 1024
 
 typedef struct head {
         struct list_head nodes;
         struct list_head hashes[HASHMAX];
+        pthread_mutex_t lock;
+        int count;
 } hash_map_t;
 
 typedef struct node {
