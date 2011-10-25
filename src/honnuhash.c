@@ -3,7 +3,27 @@
 
 #include <stdlib.h>
 
+#include <sys/types.h>
+#include <unistd.h>
+
 #include "hash-map.h"
+
+#define HH_LIMIT 1024
+
+static void hh_random_init (void)
+{
+        pid_t hh_pid = 0;
+
+        hh_pid = getpid();
+
+        srandom (hh_pid);
+}
+
+static int hh_random (void)
+{
+        /* don't want zero as a random value */
+        return ((random() % HH_LIMIT) + 1);
+}
 
 int main (int argc, char *argv[])
 {
@@ -16,15 +36,17 @@ int main (int argc, char *argv[])
                 printf ("failed to initialize hash map\n");
         }
 
+        hh_random_init ();
+
         /* insert 100 random entries
          * key - random number in the range 0 - 100
          * value - 1000000 % key
          */
         for (idx = 0; idx < 100; idx++) {
-                r = random() % 100;
+                r = hh_random ();
 
                 asprintf (&key, "%d", r);
-                asprintf (&value, "%04d", (1000000 % r));
+                asprintf (&value, "%04d", ((HH_LIMIT * HH_LIMIT + 1) % r));
 
                 old_value = hash_map_set (map, key, value);
 
@@ -39,7 +61,7 @@ int main (int argc, char *argv[])
         /* delete twenty (20) entries from the hash-map randomly */
         value = NULL;
         for (idx = 0; idx < 10; idx++) {
-                r = (random ()) % 10;
+                r = hh_random();
                 asprintf (&key, "%d", r);
 
                 value = hash_map_unset (map, key);
@@ -52,7 +74,7 @@ int main (int argc, char *argv[])
         /* retrieve ten entries from the hash-map randomly */
         idx = 0;
         while (idx < 10) {
-                r = (random ()) % 100;
+                r = hh_random();
                 asprintf (&key, "%d", r);
 
                 value = hash_map_get (map, key);

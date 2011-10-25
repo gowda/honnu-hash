@@ -162,6 +162,8 @@ int hash_map_dump (hash_map_t *map)
         int idx = 0;
         int count = 0;
         hash_node_t *node = NULL;
+        char stat_str[2048] = {0,}; /* FIXME: i might run out of index */
+        char stat_str_len = 0;
 
         for (idx = 0; idx < HASHMAX; idx++) {
                 pthread_mutex_lock (&map->lock);
@@ -170,8 +172,9 @@ int hash_map_dump (hash_map_t *map)
                         list_for_each_entry (node, &map->hashes[idx], hash) {
                                 count++;
                         }
-                        printf ("hash value - %d ==> %d entries\n",
+                        sprintf ((stat_str + stat_str_len), " (%d ==> %d)",
                                 idx, count);
+                        stat_str_len = strlen (stat_str);
                         count = 0;
                 }
 
@@ -182,6 +185,7 @@ int hash_map_dump (hash_map_t *map)
         count = map->count;
         pthread_mutex_unlock (&map->lock);
 
+        printf ("(hash ==> entries) -\n\t%s\n", stat_str);
         printf ("total entries - %d\n", count);
 
         return 0;
