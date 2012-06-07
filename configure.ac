@@ -23,9 +23,11 @@ AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER([config.h])
 
 AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+                 src/Makefile
+                 lib/Makefile])
 
 AC_PROG_CC
+AC_PROG_LIBTOOL
 
 AC_CHECK_TOOL([LD],[ld])
 
