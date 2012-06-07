@@ -1,4 +1,4 @@
-bin_PROGRAMS = honnuhash
+noinst_PROGRAMS = honnuhash
 
 honnuhash_SOURCES = honnuhash.c
 honnuhash_LDADD = $(top_builddir)/lib/libhashmap.la
