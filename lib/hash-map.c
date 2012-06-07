@@ -191,7 +191,7 @@ int hash_map_dump (hash_map_t *map)
                         list_for_each_entry (node, &map->hashes[idx], hash) {
                                 count++;
                         }
-                        sprintf ((stat_str + stat_str_len), " (%d ==> %d)",
+                        sprintf ((stat_str + stat_str_len), "\t(%d ==> %d)\n",
                                 idx, count);
                         stat_str_len = strlen (stat_str);
                         count = 0;
@@ -204,7 +204,7 @@ int hash_map_dump (hash_map_t *map)
         count = map->count;
         pthread_mutex_unlock (&map->lock);
 
-        printf ("(hash ==> entries) -\n\t%s\n", stat_str);
+        printf ("(hash ==> entries) -\n%s", stat_str);
         printf ("total entries - %d\n", count);
 
         return 0;
